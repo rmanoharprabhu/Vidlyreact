@@ -1,10 +1,20 @@
 import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
 import "bootstrap/dist/css/bootstrap.css";
+import Like from "./common/like";
 
 class Movie extends Component {
   state = {
     allMovies: getMovies(),
+    favStatus: false,
+  };
+
+  handleFavStatus = (movie) => {
+    const allMovies = [...this.state.allMovies];
+    const index = allMovies.indexOf(movie);
+    allMovies[index] = { ...allMovies[index] };
+    allMovies[index].liked = !allMovies[index].liked;
+    this.setState({ allMovies });
   };
 
   handleMovieDelete = (movie) => {
@@ -30,6 +40,7 @@ class Movie extends Component {
                 <th>Genre</th>
                 <th>Number In Stock</th>
                 <th>Rate</th>
+                <th>Favroite</th>
                 <th></th>
               </tr>
             </thead>
@@ -40,6 +51,12 @@ class Movie extends Component {
                   <td>{movie.genre.name}</td>
                   <td>{movie.numberInStock}</td>
                   <td>{movie.dailyRentalRate}</td>
+                  <td>
+                    <Like
+                      liked={movie.liked}
+                      onClick={() => this.handleFavStatus(movie)}
+                    />
+                  </td>
                   <td>
                     <button
                       onClick={() => this.handleMovieDelete({ id: movie._id })}
@@ -57,6 +74,10 @@ class Movie extends Component {
       </>
     );
   }
+
+  getFavStatusClass = () => {
+    return this.state.favStatus ? "fa fa-heart" : "fa fa-heart-o";
+  };
 }
 
 export default Movie;
