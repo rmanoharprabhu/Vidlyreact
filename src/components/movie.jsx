@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
 import "bootstrap/dist/css/bootstrap.css";
-import Like from "./common/like";
+import Like from "../common/like";
+import Pagination from "../common/pagination";
 
 class Movie extends Component {
   state = {
     allMovies: getMovies(),
     favStatus: false,
+    pageSize: 3,
   };
 
   handleFavStatus = (movie) => {
@@ -69,8 +71,8 @@ class Movie extends Component {
               ))}
             </tbody>
           </table>
+          <Pagination totalItems={count} pageSize={this.state.pageSize} />
         </div>
-        )}
       </>
     );
   }
