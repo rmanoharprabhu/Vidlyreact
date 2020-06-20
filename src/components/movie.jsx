@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { getMovies } from "../services/fakeMovieService";
-import "bootstrap/dist/css/bootstrap.css";
 import Like from "../common/like";
 import Pagination from "../common/pagination";
 import { ToastContainer, toast } from "react-toastify";
+import Tippy from "@tippyjs/react";
+import { getMovies } from "../services/fakeMovieService";
+import "bootstrap/dist/css/bootstrap.css";
 import "react-toastify/dist/ReactToastify.css";
 
 class Movie extends Component {
@@ -65,12 +66,14 @@ class Movie extends Component {
                     />
                   </td>
                   <td>
-                    <button
-                      onClick={() => this.handleMovieDelete(movie)}
-                      className="btn btn-danger btm-sm"
-                    >
-                      Delete
-                    </button>
+                    <Tippy content={"Remove the movie"}>
+                      <button
+                        onClick={() => this.handleMovieDelete(movie)}
+                        className="btn btn-danger btm-sm"
+                      >
+                        Delete
+                      </button>
+                    </Tippy>
                     <ToastContainer autoClose={1000} />
                   </td>
                 </tr>
