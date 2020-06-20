@@ -3,6 +3,8 @@ import { getMovies } from "../services/fakeMovieService";
 import "bootstrap/dist/css/bootstrap.css";
 import Like from "../common/like";
 import Pagination from "../common/pagination";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 class Movie extends Component {
   state = {
@@ -21,10 +23,13 @@ class Movie extends Component {
 
   handleMovieDelete = (movie) => {
     const filteredMovies = this.state.allMovies.filter(
-      (s) => s._id !== movie.id
+      (s) => s._id !== movie._id
     );
+    const movieTitle = movie.title;
     console.table(filteredMovies);
     this.setState({ allMovies: filteredMovies });
+
+    toast.success("Deleted the movie " + movieTitle + " Sucessfully ");
   };
   render() {
     const { length: count } = this.state.allMovies;
@@ -61,11 +66,12 @@ class Movie extends Component {
                   </td>
                   <td>
                     <button
-                      onClick={() => this.handleMovieDelete({ id: movie._id })}
+                      onClick={() => this.handleMovieDelete(movie)}
                       className="btn btn-danger btm-sm"
                     >
                       Delete
                     </button>
+                    <ToastContainer autoClose={1000} />
                   </td>
                 </tr>
               ))}
