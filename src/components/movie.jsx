@@ -6,20 +6,27 @@ import Tippy from "@tippyjs/react";
 import { getMovies } from "../services/fakeMovieService";
 import "bootstrap/dist/css/bootstrap.css";
 import "react-toastify/dist/ReactToastify.css";
+import { paginate } from "../utils/paginate";
 
 class Movie extends Component {
   state = {
     allMovies: getMovies(),
     favStatus: false,
-    pageSize: 3,
+    pageSize: 4,
+    currentPage: 1,
   };
 
   handleFavStatus = (movie) => {
+    //Creating a new array with objects.
     const allMovies = [...this.state.allMovies];
-    const index = allMovies.indexOf(movie);
-    allMovies[index] = { ...allMovies[index] };
-    allMovies[index].liked = !allMovies[index].liked;
-    this.setState({ allMovies });
+    const index = allMovies.indexOf(movie); //Taking the index of the object
+    allMovies[index] = { ...allMovies[index] }; //Take a copy of the object based on index.
+    allMovies[index].liked = !allMovies[index].liked; //Change the value from the copied value
+    this.setState({ allMovies }); //update the changed index back to orginal array.
+  };
+
+  handlePageChange = (page) => {
+    this.setState({ currentPage: page });
   };
 
   handleMovieDelete = (movie) => {
@@ -27,20 +34,29 @@ class Movie extends Component {
       (s) => s._id !== movie._id
     );
     const movieTitle = movie.title;
-    console.table(filteredMovies);
+    //console.table(filteredMovies);
     this.setState({ allMovies: filteredMovies });
 
     toast.success("Deleted the movie " + movieTitle + " Sucessfully ");
   };
+
   render() {
+    const { pageSize, currentPage, allMovies } = this.state;
+    const movies = paginate(allMovies, currentPage, pageSize);
+    //using object destrucring we are taking the length of the array.
     const { length: count } = this.state.allMovies;
+
     if (count === 0) {
       return <h1>No Movies Found in the Database</h1>;
     }
     return (
       <>
         <div>
-          <h3>Currently displaying {count} Movies from Database</h3>
+          <h3>
+            Currently displaying{" "}
+            {pageSize * currentPage >= count ? count : pageSize * currentPage} /{" "}
+            {count} Movies from Database
+          </h3>
           <table className="table table-hover">
             <thead>
               <tr>
@@ -53,7 +69,7 @@ class Movie extends Component {
               </tr>
             </thead>
             <tbody>
-              {this.state.allMovies.map((movie) => (
+              {movies.map((movie) => (
                 <tr key={movie._id}>
                   <td>{movie.title}</td>
                   <td>{movie.genre.name}</td>
@@ -80,7 +96,12 @@ class Movie extends Component {
               ))}
             </tbody>
           </table>
-          <Pagination totalItems={count} pageSize={this.state.pageSize} />
+          <Pagination
+            totalItems={count}
+            pageSize={pageSize}
+            currentPage={currentPage}
+            onPageChange={this.handlePageChange}
+          />
         </div>
       </>
     );
