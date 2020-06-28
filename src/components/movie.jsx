@@ -1,19 +1,39 @@
 import React, { Component } from "react";
-import Like from "../common/like";
+import MovieTable from "./movieTable";
 import Pagination from "../common/pagination";
-import { ToastContainer, toast } from "react-toastify";
-import Tippy from "@tippyjs/react";
 import { getMovies } from "../services/fakeMovieService";
 import "bootstrap/dist/css/bootstrap.css";
 import "react-toastify/dist/ReactToastify.css";
 import { paginate } from "../utils/paginate";
+import ListGroup from "../common/listGroup";
+import { getGenres } from "../services/fakeGenreService";
+import { toast } from "react-toastify";
 
 class Movie extends Component {
   state = {
-    allMovies: getMovies(),
+    allMovies: [],
+    allGenres: [],
     favStatus: false,
     pageSize: 4,
     currentPage: 1,
+    selectedGener: "",
+  };
+
+  componentDidMount = () => {
+    // My way of implementation
+    // const defaultItem = { _id: 0, name: "All Genres" };
+    // const generes = getGenres();
+    // generes.splice(0, 0, defaultItem);
+
+    //The Other Way
+    const defaultItem = { _id: 0, name: "All Genres" };
+    const generes = [defaultItem, ...getGenres()];
+
+    this.setState({
+      allMovies: getMovies(),
+      allGenres: generes,
+      selectedGener: defaultItem,
+    });
   };
 
   handleFavStatus = (movie) => {
@@ -40,68 +60,62 @@ class Movie extends Component {
     toast.success("Deleted the movie " + movieTitle + " Sucessfully ");
   };
 
+  handleGeneChange = (gene) => {
+    //console.log(gene);
+    this.setState({ selectedGener: gene, currentPage: 1 });
+  };
+
   render() {
-    const { pageSize, currentPage, allMovies } = this.state;
-    const movies = paginate(allMovies, currentPage, pageSize);
+    const {
+      pageSize,
+      currentPage,
+      allMovies,
+      allGenres,
+      selectedGener,
+    } = this.state;
+
+    const filteredMovies =
+      selectedGener && selectedGener._id !== 0
+        ? allMovies.filter((s) => s.genre._id === selectedGener._id)
+        : allMovies;
+    //console.log(filteredMovies);
+
     //using object destrucring we are taking the length of the array.
-    const { length: count } = this.state.allMovies;
+    const movies = paginate(filteredMovies, currentPage, pageSize);
+    const { length: count } = filteredMovies;
 
     if (count === 0) {
       return <h1>No Movies Found in the Database</h1>;
     }
     return (
       <>
-        <div>
-          <h3>
-            Currently displaying{" "}
-            {pageSize * currentPage >= count ? count : pageSize * currentPage} /{" "}
-            {count} Movies from Database
-          </h3>
-          <table className="table table-hover">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Genre</th>
-                <th>Number In Stock</th>
-                <th>Rate</th>
-                <th>Favroite</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {movies.map((movie) => (
-                <tr key={movie._id}>
-                  <td>{movie.title}</td>
-                  <td>{movie.genre.name}</td>
-                  <td>{movie.numberInStock}</td>
-                  <td>{movie.dailyRentalRate}</td>
-                  <td>
-                    <Like
-                      liked={movie.liked}
-                      onClick={() => this.handleFavStatus(movie)}
-                    />
-                  </td>
-                  <td>
-                    <Tippy content={"Remove the movie"}>
-                      <button
-                        onClick={() => this.handleMovieDelete(movie)}
-                        className="btn btn-danger btm-sm"
-                      >
-                        Delete
-                      </button>
-                    </Tippy>
-                    <ToastContainer autoClose={1000} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <Pagination
-            totalItems={count}
-            pageSize={pageSize}
-            currentPage={currentPage}
-            onPageChange={this.handlePageChange}
-          />
+        <div className="row">
+          <div className="col-3">
+            <ListGroup
+              onItemSelect={this.handleGeneChange}
+              selectedItem={selectedGener}
+              items={allGenres}
+            ></ListGroup>
+          </div>
+          <div className="col">
+            <h3>
+              Currently displaying{" "}
+              {pageSize * currentPage >= count ? count : pageSize * currentPage}{" "}
+              / {count} Movies from Database
+            </h3>
+
+            <MovieTable
+              movies={movies}
+              onLike={this.handleFavStatus}
+              onDelete={this.handleMovieDelete}
+            ></MovieTable>
+            <Pagination
+              totalItems={count}
+              pageSize={pageSize}
+              currentPage={currentPage}
+              onPageChange={this.handlePageChange}
+            />
+          </div>
         </div>
       </>
     );
