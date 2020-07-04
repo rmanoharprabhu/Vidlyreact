@@ -8,6 +8,7 @@ import { paginate } from "../utils/paginate";
 import ListGroup from "../common/listGroup";
 import { getGenres } from "../services/fakeGenreService";
 import { toast } from "react-toastify";
+import _ from "lodash";
 
 class Movie extends Component {
   state = {
@@ -17,6 +18,7 @@ class Movie extends Component {
     pageSize: 4,
     currentPage: 1,
     selectedGener: "",
+    sortColumn: { path: "title", sortType: "asc" },
   };
 
   componentDidMount = () => {
@@ -65,6 +67,11 @@ class Movie extends Component {
     this.setState({ selectedGener: gene, currentPage: 1 });
   };
 
+  handleSort = (sortColumn) => {
+    //If both Object and Values are same we can use like below.
+    this.setState({ sortColumn });
+  };
+
   render() {
     const {
       pageSize,
@@ -72,6 +79,7 @@ class Movie extends Component {
       allMovies,
       allGenres,
       selectedGener,
+      sortColumn,
     } = this.state;
 
     const filteredMovies =
@@ -80,8 +88,14 @@ class Movie extends Component {
         : allMovies;
     //console.log(filteredMovies);
 
+    const sorted = _.orderBy(
+      filteredMovies,
+      [sortColumn.path],
+      [sortColumn.sortType]
+    );
+
     //using object destrucring we are taking the length of the array.
-    const movies = paginate(filteredMovies, currentPage, pageSize);
+    const movies = paginate(sorted, currentPage, pageSize);
     const { length: count } = filteredMovies;
 
     if (count === 0) {
@@ -108,6 +122,8 @@ class Movie extends Component {
               movies={movies}
               onLike={this.handleFavStatus}
               onDelete={this.handleMovieDelete}
+              onSort={this.handleSort}
+              sortColumn={sortColumn}
             ></MovieTable>
             <Pagination
               totalItems={count}
