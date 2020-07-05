@@ -46,14 +46,6 @@ class MovieTable extends Component {
         onSort={onSort}
         data={movies}
       ></Table>
-      // <table className="table table-hover">
-      //   <TableHeader
-      //     columns={this.columns}
-      //     sortColumn={this.props.sortColumn}
-      //     onSort={this.props.onSort}
-      //   />
-      //   <TableBody data={movies} columns={this.columns}></TableBody>
-      // </table>
     );
   }
 }
