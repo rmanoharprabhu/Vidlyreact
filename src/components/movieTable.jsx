@@ -5,6 +5,7 @@ import Tippy from "@tippyjs/react";
 import { ToastContainer } from "react-toastify";
 
 class MovieTable extends Component {
+  //To set the key I used the ID methos to inditify the same. Even in real time we will get the columns with id.
   columns = [
     { path: "title", label: "Title", id: "1" },
     { path: "genre.name", label: "Genre", id: "2" },
