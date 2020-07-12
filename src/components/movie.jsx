@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import MovieTable from "./movieTable";
 import Pagination from "../common/pagination";
-import { getMovies } from "../services/fakeMovieService";
-import "bootstrap/dist/css/bootstrap.css";
-import "react-toastify/dist/ReactToastify.css";
-import { paginate } from "../utils/paginate";
 import ListGroup from "../common/listGroup";
+import _ from "lodash";
+import { getMovies } from "../services/fakeMovieService";
+import { paginate } from "../utils/paginate";
 import { getGenres } from "../services/fakeGenreService";
 import { toast } from "react-toastify";
-import _ from "lodash";
+import "bootstrap/dist/css/bootstrap.css";
+import "react-toastify/dist/ReactToastify.css";
 
 class Movie extends Component {
   state = {
